@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Confirmation - MHMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success shadow-lg">
+                <div class="card-body p-5 text-center">
+                    <i class="fas fa-check-circle text-success mb-4" style="font-size: 5rem;"></i>
+                    <h2 class="text-success mb-4">Payment Successful!</h2>
+                    <p class="lead mb-4">Your payment has been processed and booking confirmed.</p>
+                    
+                    <div class="booking-details bg-light p-4 rounded mb-4">
+                        <h5 class="mb-3">Payment Details:</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>Transaction ID:</strong> {{ payment.transaction_id }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Amount:</strong> ₹{{ payment.amount }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Status:</strong> 
+                                <span class="badge bg-success fs-6 px-3 py-2">{{ payment.get_status_display }}</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Paid:</strong> {{ payment.paid_at|date:"M d, Y g:i A" }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-details bg-light p-4 rounded mb-4">
+                        <h5 class="mb-3">Booking Details:</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>Maid:</strong> {{ booking.maid.name }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Date:</strong> {{ booking.booking_date|date:"M d, Y 'at' g:i A" }}
+                            </div>
+                            <div class="col-md-12 mb-2">
+                                <strong>Status:</strong> 
+                                <span class="badge bg-success fs-6 px-3 py-2">{{ booking.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% if user.maid_profile %}{% url 'maids:maid_dashboard' %}{% else %}{% url 'maids:public_list' %}{% endif %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-house me-1"></i> Dashboard
+                        </a>
+                        <a href="{% url 'users:profile' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person me-1"></i> Profile & Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

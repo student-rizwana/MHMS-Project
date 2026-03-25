@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Availability - MHMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="bi bi-toggle-on"></i> Update Availability</h4>
+                </div>
+                <div class="card-body text-center p-5">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <div class="form-check form-switch d-inline-block mx-auto">
+                                {{ form.availability }}
+                                <label class="form-check-label fs-5 fw-bold" for="{{ form.availability.id_for_label }}">
+                                    Set Availability
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">Update Status</button>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'maids:maid_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-switch .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+</style>
+{% endblock %}

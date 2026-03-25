@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - MHMS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3><i class="bi bi-person"></i> My Profile</h3>
+                </div>
+                <div class="row g-0">
+                    <div class="col-md-4 text-center p-4 bg-light">
+                        {% if maid.photo %}
+                            <img src="{{ maid.photo.url }}" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="{{ maid.name }}">
+                        {% else %}
+                            <i class="bi bi-person-circle fs-1 text-muted mb-3"></i>
+                        {% endif %}
+                        <h4 class="mb-1">{{ maid.name }}</h4>
+                        <div class="star-rating mb-2">
+                            {% for i in "12345"|make_list %}
+                                <i class="bi bi-star{% if forloop.counter <= maid.avg_rating|floatformat:0 %} filled{% endif %}"></i>
+                            {% endfor %}
+                            <span class="ms-1 fw-bold">{{ maid.avg_rating }}/5</span>
+                        </div>
+                        <span class="badge bg-{% if maid.availability %}success{% else %}danger{% endif %} fs-6">
+                            {% if maid.availability %}Available{% else %}Busy{% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5>Phone: {{ maid.phone }}</h5>
+                            <p><strong>Location:</strong> {{ maid.location }}</p>
+                            <p><strong>Experience:</strong> {{ maid.experience }} years</p>
+                            <h6>Skills:</h6>
+                            <div>
+                                {% for skill in maid.skills.split %}<span class="badge bg-light text-dark me-1 mb-1">{{ skill }}</span>{% endfor %}
+                            </div>
+                            <div class="mt-4">
+                                <a href="{% url 'maids:maid_profile_update' %}" class="btn btn-primary me-2">Edit Profile</a>
+                                <a href="{% url 'maids:maid_dashboard' %}" class="btn btn-outline-secondary">Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6>Quick Actions</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'maids:maid_dashboard' %}" class="list-group-item list-group-item-action">Dashboard</a>
+                    <a href="{% url 'maids:maid_bookings' %}" class="list-group-item list-group-item-action">Bookings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

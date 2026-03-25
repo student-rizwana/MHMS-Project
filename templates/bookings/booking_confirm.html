@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Booking Confirmation
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success shadow-lg">
+                <div class="card-body p-5 text-center">
+                    <i class="fas fa-check-circle text-success mb-4" style="font-size: 5rem;"></i>
+                    <h2 class="text-success mb-4">Booking Created Successfully!</h2>
+                    <div class="mb-4">
+                        <p class="lead mb-0">Your booking request has been sent to the maid for approval.</p>
+                    </div>
+                    
+                    <div class="booking-details bg-light p-4 rounded mb-4">
+                        <h5 class="mb-3">Booking Details:</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>Maid:</strong> {{ maid.name }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Date & Time:</strong> {{ booking.booking_date|date:"M d, Y 'at' g:i A" }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Status:</strong> <span class="badge bg-warning text-dark fs-6 px-3 py-2">Pending</span>
+                            </div>
+                            {% if booking.service_type %}
+                            <div class="col-md-6 mb-2">
+                                <strong>Service Type:</strong> {{ booking.service_type }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'maids:public_list' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-house me-1"></i> Browse More Maids
+                        </a>
+                        <a href="{% url 'users:profile' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person me-1"></i> View Profile & Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

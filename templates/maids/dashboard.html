@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block title %}Maid Dashboard - MHMS{% endblock %}
+
+{% block content %}
+<div class="messages">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 1050; min-width: 300px;" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="bi bi-house-door"></i> My Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Profile Summary & Availability Toggle -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center mb-3 mb-md-0">
+                            {% if maid.photo %}
+                                <img src="{{ maid.photo.url }}" class="img-fluid rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 120px; height: 120px;">
+                                    <i class="bi bi-person-circle fs-2 text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <h2 class="mb-2">{{ maid.name }}</h2>
+                            <p class="lead mb-1">{{ maid.phone }} | {{ maid.location }}</p>
+                            <div class="star-rating mb-3">
+                                {% for i in "12345"|make_list %}
+                                    <i class="bi bi-star{% if forloop.counter <= maid.avg_rating|floatformat:0 %} text-warning{% endif %} fs-5"></i>
+                                {% endfor %}
+                                <span class="ms-2 h5 fw-bold text-primary">{{ maid.avg_rating }}/5</span>
+                                <span class="badge bg-secondary ms-2">{{ total_reviews }} reviews</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Experience:</strong> {{ maid.experience }} years | 
+                                <strong>Skills:</strong> 
+                                {% for skill in maid.skills.split %}<span class="badge bg-light text-dark border me-1">{{ skill }}</span>{% endfor %}
+                            </div>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'maids:maid_profile_update' %}" class="btn btn-outline-primary">Edit Profile</a>
+                                <a href="{% url 'maids:maid_bookings' %}" class="btn btn-outline-success">All Bookings</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <form method="post" action="{% url 'maids:toggle_availability' %}" class="card shadow-lg border-0 h-100">
+                {% csrf_token %}
+                <div class="card-body d-flex flex-column p-4">
+                    <h5 class="card-title mb-4 text-center"><i class="bi bi-clock"></i> Availability Status</h5>
+                    <div class="form-check form-switch mx-auto mb-4" style="transform: scale(1.5);">
+                        {{ availability_form.availability }}
+                        <label class="form-check-label" for="{{ availability_form.availability.id_for_label }}">
+                            <span class="h4 fw-bold">{% if maid.availability %}Available <i class="bi bi-check-circle-fill text-success"></i>{% else %}Busy <i class="bi bi-x-circle-fill text-danger"></i>{% endif %}</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">
+                        <i class="bi bi-check-lg"></i> Update Status
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pending Bookings -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4"><i class="bi bi-bell"></i> Pending Requests <span class="badge bg-warning fs-6">{{ pending_bookings|length }}</span></h3>
+            {% if pending_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Client</th>
+                                <th>Service Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in pending_bookings %}
+                            <tr class="table-warning">
+                                <td>
+                                    <strong>{{ booking.user.username }}</strong>
+                                    <br><small>{{ booking.user.email }}</small>
+                                </td>
+                                <td>
+                                    <div>
+                                        <i class="bi bi-calendar-event text-primary"></i>
+                                        <strong>{{ booking.booking_date|date:"M d, Y" }}</strong>
+                                        <br><small>{{ booking.booking_date|time:"h:i A" }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'maids:accept_booking' booking.pk %}" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check-lg"></i> Accept
+                                        </a>
+                                        <a href="{% url 'maids:reject_booking' booking.pk %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end mt-3">
+                    <a href="{% url 'maids:maid_bookings' %}" class="btn btn-primary">
+                        <i class="bi bi-list-ul"></i> View All Bookings
+                    </a>
+                </div>
+            {% else %}
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="bi bi-inbox fs-3 me-3"></i>
+                    <div>
+                        <h5>No Pending Requests</h5>
+                        <p>You're ready to receive bookings! Make sure you're marked as available.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4"><i class="bi bi-star-fill text-warning"></i> Recent Feedback <span class="badge bg-info">{{ total_reviews }}</span></h3>
+            <div class="row g-4">
+                {% for review in reviews %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="star-rating me-3">
+                                    {% for i in "12345"|make_list %}
+                                        <i class="bi bi-star{% if forloop.counter <= review.rating %} text-warning filled{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <div>
+                                    <strong>{{ review.user.username }}</strong>
+                                    <small class="text-muted d-block">{{ review.created_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                            {% if review.comment %}
+                                <p class="mb-0">{{ review.comment|truncatewords:25 }}</p>
+                            {% else %}
+                                <p class="text-muted small mb-0">No comment</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-secondary text-center py-5">
+                        <i class="bi bi-star-half fs-1 mb-3 text-muted"></i>
+                        <h5>No reviews yet</h5>
+                        <p class="mb-4">Complete some bookings to receive feedback from customers.</p>
+                        <a href="{% url 'maids:maid_bookings' %}" class="btn btn-outline-primary">View Bookings</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if reviews %}
+                <div class="text-center mt-4">
+                    <a href="{% url 'maids:maid_bookings' %}" class="btn btn-outline-primary">View All Feedback</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-5 pt-5 border-top">
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'maids:maid_profile' %}" class="card border-0 shadow h-100 text-decoration-none text-reset">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-person-gear fs-1 mb-3 text-primary"></i>
+                    <h5>Manage Profile</h5>
+                    <p class="text-muted">Update your details and photo</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'maids:maid_bookings' %}" class="card border-0 shadow h-100 text-decoration-none text-reset">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-calendar3 fs-1 mb-3 text-success"></i>
+                    <h5>Bookings</h5>
+                    <p class="text-muted">View all your bookings</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'maids:toggle_availability' %}" class="card border-0 shadow h-100 text-decoration-none text-reset">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-power fs-1 mb-3 text-info"></i>
+                    <h5>Status</h5>
+                    <p class="text-muted">Quick availability toggle</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

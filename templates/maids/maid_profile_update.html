@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Profile - MHMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3><i class="bi bi-pencil"></i> Update Profile</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.phone.label }}</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}<div class="text-danger">{{ form.phone.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{{ form.location.label }}</label>
+                                {{ form.location }}
+                                {% if form.location.errors %}<div class="text-danger">{{ form.location.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-4">
+                                <label class="form-label">{{ form.experience.label }}</label>
+                                {{ form.experience }}
+                                {% if form.experience.errors %}<div class="text-danger">{{ form.experience.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">{{ form.skills.label }}</label>
+                                {{ form.skills }}
+                                <small class="form-text text-muted">Comma separated skills</small>
+                                {% if form.skills.errors %}<div class="text-danger">{{ form.skills.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-3">
+                            <div class="col-12">
+                                <label class="form-label">{{ form.photo.label }}</label>
+                                {{ form.photo }}
+                                <small class="form-text text-muted">Upload new photo (optional)</small>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-success">Update Profile</button>
+                            <a href="{% url 'maids:maid_profile' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

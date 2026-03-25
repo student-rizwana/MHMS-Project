@@ -1,0 +1,89 @@
+/* MHMS Custom Styles */
+
+:root {
+  --star-color: #ffc107;
+  --star-empty: #dee2e6;
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body {
+  min-height: 100vh;
+}
+
+.hero-section {
+  background: var(--primary-gradient);
+}
+
+.maid-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+}
+
+.maid-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.star-rating {
+  color: var(--star-empty);
+  font-size: 1.2rem;
+}
+
+.star-rating .bi-star-fill {
+  color: var(--star-color);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.btn-book {
+  background: linear-gradient(45deg, #28a745, #20c997);
+  border: none;
+}
+
+.btn-book:hover {
+  transform: scale(1.05);
+}
+
+.search-form input {
+  border-radius: 10px;
+}
+
+.feedback-stars input[type="radio"] {
+  display: none;
+}
+
+.feedback-stars label {
+  color: var(--star-empty);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.feedback-stars input:checked ~ label,
+.feedback-stars label:hover,
+.feedback-stars label:hover ~ label {
+  color: var(--star-color);
+}
+
+footer {
+  margin-top: auto;
+}
+
+footer a:hover {
+  color: #ffc107 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .maid-card {
+    margin-bottom: 1rem;
+  }
+  
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+}
+

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - MHMS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-check"></i> My Bookings</h2>
+        <a href="{% url 'maids:maid_dashboard' %}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+    </div>
+
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Client</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>
+                        <strong>{{ booking.user.username }}</strong>
+                        <br><small class="text-muted">{{ booking.user.email }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ booking.booking_date|date:"M d, Y h:i A" }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge bg-{% if booking.status == 'pending' %}warning
+                            {% elif booking.status == 'confirmed' %}success
+                            {% elif booking.status == 'rejected' %}danger
+                            {% elif booking.status == 'completed' %}info
+                            {% else %}secondary{% endif %}">{{ booking.get_status_display }}</span>
+                    </td>
+                    <td>{{ booking.created_at|date:"M d" }}</td>
+                    <td>
+                        {% if booking.status == 'pending' %}
+                            <a href="{% url 'maids:accept_booking' booking.pk %}" class="btn btn-sm btn-success me-1">Accept</a>
+                            <a href="{% url 'maids:reject_booking' booking.pk %}" class="btn btn-sm btn-outline-danger">Reject</a>
+                        {% else %}
+                            <span class="text-muted small">No action needed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if bookings.has_other_pages %}
+    <nav aria-label="Bookings pagination">
+        <ul class="pagination justify-content-center">
+            {% if bookings.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ bookings.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            {% for num in bookings.paginator.page_range %}
+                <li class="page-item {% if bookings.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endfor %}
+            {% if bookings.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ bookings.next_page_number }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="bi bi-calendar-x fs-1 mb-3 d-block"></i>
+        <h4>No bookings yet</h4>
+        <p>Your bookings will appear here when clients book you.</p>
+        <a href="{% url 'maids:maid_dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

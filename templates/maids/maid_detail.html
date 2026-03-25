@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ maid.name }} - MHMS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    {% if maid.photo %}
+                    <img src="{{ maid.photo.url }}" class="img-fluid rounded-start h-100" alt="{{ maid.name }}">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center h-100 rounded-start">
+                        <i class="bi bi-person-circle fs-1 text-muted"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h1 class="card-title">{{ maid.name }}</h1>
+                        <div class="star-rating mb-3">
+                            {% for i in "12345"|make_list %}
+                            <i class="bi bi-star{% if forloop.counter <= avg_rating %} filled{% endif %} fs-4"></i>
+                            {% endfor %}
+                            <span class="fs-5 ms-2">{{ avg_rating|default:"0" }}/5 ({{ maid.reviews.count }} reviews)</span>
+                        </div>
+                        <p class="lead"><strong>Location:</strong> {{ maid.location }}</p>
+                        <p><strong>Experience:</strong> {{ maid.experience }} years</p>
+                        <p><strong>Availability:</strong> 
+                            {% if maid.availability %}
+                            <span class="badge bg-success">Available</span>
+                            {% else %}
+                            <span class="badge bg-danger">Not Available</span>
+                            {% endif %}
+                        </p>
+                        <h5>Skills:</h5>
+                        <ul class="list-unstyled">
+                            {% for skill in maid.skills.split %}
+                            <li class="badge bg-light text-dark me-1 mb-1">{{ skill }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if maid.availability %}
+                        <a href="{% url 'bookings:book_maid' maid.name %}" class="btn btn-success btn-lg mt-3">Book Now</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review link - for users with confirmed booking but no review -->
+        {% if user.is_authenticated and user_bookings %}
+            {% with booking=user_bookings.first %}
+                {% if booking and not booking.review %}
+                <div class="card shadow mt-4">
+                    <div class="card-body">
+                        <a href="{% url 'maids:review_create' booking.id %}" class="btn btn-outline-warning">
+                            <i class="bi bi-star"></i> Leave a Review for this booking
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5>Recent Reviews</h5>
+            </div>
+            <div class="card-body">
+                {% for review in reviews|slice:":5" %}
+                <div class="mb-3 pb-2 border-bottom">
+                    <div class="star-rating mb-1">
+                        {% for i in "12345"|make_list %}
+                        <i class="bi bi-star{% if forloop.counter <= review.rating %} filled{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <strong>{{ review.user.username }}</strong> - {{ review.created_at|date:"M d" }}
+                    <p class="small mb-0">{{ review.comment|truncatewords:15 }}</p>
+                </div>
+                {% empty %}
+                <p class="text-muted">No reviews yet. Be the first!</p>
+                {% endfor %}
+                {% if reviews.count > 5 %}
+                <small class="text-muted">{{ reviews.count }} total reviews</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bi-star {
+        color: #ffc107;
+    }
+    .bi-star:not(.filled) {
+        color: #dee2e6;
+    }
+</style>
+{% endblock %}
+
